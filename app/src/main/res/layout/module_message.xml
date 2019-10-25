@@ -15,7 +15,7 @@
             app:layout_constraintTop_toTopOf="parent"
             android:text="@{text}"
             android:background="@drawable/rounded_shape"
-            android:backgroundTint="@color/colorPrimary"
+            android:backgroundTint="@color/primaryColor"
             app:layout_constraintEnd_toEndOf="parent"
             android:textSize="16sp"
             android:id="@+id/mesage"
