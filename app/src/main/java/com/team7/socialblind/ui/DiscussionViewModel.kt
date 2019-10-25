@@ -18,6 +18,7 @@ import timber.log.Timber
 
 data class DiscussionState(val discusion : Async<Discussion> = Uninitialized,
                            val timeFinishedEvent: Event<None>? = null ,
+                           val subjectEvent: Event<String>? = null,
                            val timeLeft :Event<Long>? = null ,
                            val onNewMassageSent : Event<None>?  = null): State
 class DiscussionViewModel() :BaseViewModel<DiscussionState>(DiscussionState()){
@@ -32,6 +33,15 @@ class DiscussionViewModel() :BaseViewModel<DiscussionState>(DiscussionState()){
             }, {
                 setDiscussionState(Fail(DiscussionFailure))
             })
+        repository.getSubjectObservable().observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+                setState {
+                    copy(subjectEvent = Event(it))
+                }
+            }, {
+                Timber.e(it)
+            })
         getCreatedAt()
     }
     fun setDiscussionState(state:Async<Discussion>){
@@ -40,11 +50,11 @@ class DiscussionViewModel() :BaseViewModel<DiscussionState>(DiscussionState()){
         }
     }
     private fun getCreatedAt(){
+        val either  = viewModelScope.async(Dispatchers.IO){
+            repository.getLeftSeconds()
+        }
         viewModelScope.launch(Dispatchers.Main) {
-            val either  = async(Dispatchers.IO){
-                repository.getLeftSeconds()
-            }.await()
-            either.either({
+            either.await().either({
                 Timber.e("Failure")
             }, {
                 setState {
@@ -57,22 +67,24 @@ class DiscussionViewModel() :BaseViewModel<DiscussionState>(DiscussionState()){
                 }
             })
         }
+
+
     }
 
     fun sendMessage(text:String){
-        viewModelScope.launch(Dispatchers.Main){
-            val either  = async(Dispatchers.IO) {
+        val either  = viewModelScope.async(Dispatchers.IO) {
                 repository.sendMessage(text)
-            }.await()
-            either.either({
-              Timber.e("Failure")
+        }
+        viewModelScope.launch(Dispatchers.Main) {
+            either.await().either({
+                Timber.e("Failure")
             }, {
                 setState {
                     copy(onNewMassageSent = Event(None()))
                 }
             })
-
         }
+
     }
     fun setTimeFinished(){
         repository.deleteTime()
@@ -81,8 +93,14 @@ class DiscussionViewModel() :BaseViewModel<DiscussionState>(DiscussionState()){
         }
     }
     fun changeSubject(){
-
+        val either = viewModelScope.async (Dispatchers.IO){
+            repository.changeSubject()
+        }
+        viewModelScope.launch(Dispatchers.Main) {
+            Timber.e(either.await().toString())
+        }
     }
+
 
 
 

@@ -8,20 +8,22 @@ import com.team7.socialblind.models.Message
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import timber.log.Timber
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 class DiscussionRepository(private val sharedPreferences: SharedPreferences) {
 
+    var currentString = ""
 
     private val databaseReference = FirebaseDatabase.getInstance().reference
     fun observeMessages():Observable<Discussion> {
         val behaviorSubject  = BehaviorSubject.create<Discussion>()
         val currentDiscussion = getCurrentDiscussionId()
         val userId = getUserId()
-        Timber.e("$currentDiscussion")
-
         databaseReference.child(DISCUSSION_ROOT).child(currentDiscussion)
             .addValueEventListener(object :ValueEventListener{
             override fun onCancelled(p0: DatabaseError) {
@@ -122,9 +124,39 @@ class DiscussionRepository(private val sharedPreferences: SharedPreferences) {
         // go to the lobby page
 
     }
-    suspend fun changeSubject(): None = suspendCoroutine{
+    fun getSubjectObservable():Observable<String>{
+        val currentDiscussionId = getCurrentDiscussionId()
+        val behaviorSubject = BehaviorSubject.create<String>()
+        databaseReference.child(DISCUSSION_ROOT).child(currentDiscussionId).child(REMOTE_CURRENT_SUBJECT).addValueEventListener(object :ValueEventListener{
+            override fun onCancelled(p0: DatabaseError) {
+                behaviorSubject.onError(p0.toException())
+            }
 
+            override fun onDataChange(p0: DataSnapshot) {
+                val subjectId = p0.value as String
+                val subject = SUBJECTS[subjectId.toInt()]
+                currentString = subject
+                behaviorSubject.onNext(subject)
+            }
+        })
+        return behaviorSubject.toFlowable(BackpressureStrategy.DROP).toObservable()
     }
+    suspend fun changeSubject():Either<SendMessageFailure , None> = suspendCoroutine{
+        continuation ->
+        val element = SUBJECTS.toList().random()
+        val currentDiscussionId = getCurrentDiscussionId()
+        Timber.e("${SUBJECTS.indexOf(element)}")
+        databaseReference.child(DISCUSSION_ROOT).child(currentDiscussionId).child(REMOTE_CURRENT_SUBJECT)
+            .setValue(SUBJECTS.indexOf(element).toString()).addOnCompleteListener {
+                if(it.isSuccessful){
+                    continuation.resume(Either.Right(None()))
+                }else{
+                    continuation.resume(Either.Left(SendMessageFailure))
+                }
+            }
+    }
+
+
 }
 data class RemoteMessage(val from:String ,val text :String )
 

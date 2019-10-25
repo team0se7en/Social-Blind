@@ -24,7 +24,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.team7.socialblind.R
 import com.team7.socialblind.util.Loading
 
-const val SUBJECT_STRING = "Her is a subject to talk about it have fun : "
+const val SUBJECT_STRING = "Here is a subject to talk about it have fun : "
 class MainActivity : AppCompatActivity() {
     private lateinit var dialog:AlertDialog
 
