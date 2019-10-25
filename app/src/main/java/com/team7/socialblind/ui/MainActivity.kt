@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProviders
@@ -57,7 +58,14 @@ class MainActivity : AppCompatActivity() {
             }
         }
         binding.sendButton.setOnClickListener {
-            viewModel.sendMessage(binding.messageEdittext.text.toString())
+            // implement the on dots pic clicked
+        }
+        binding.messageEdittext.setOnEditorActionListener { textView, i, keyEvent ->
+            if (i == EditorInfo.IME_ACTION_SEND) {
+                viewModel.sendMessage(binding.messageEdittext.text.toString())
+                true
+            }
+             false
         }
 
     }
