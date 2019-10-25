@@ -34,6 +34,7 @@ class MainActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this , R.layout.activity_main)
         binding.controller = controller
         setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true )
         viewModel.initialize(repository)
         viewModel.observe(this ){
             it.discusion.handleDiscussion()

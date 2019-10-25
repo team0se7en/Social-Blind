@@ -93,6 +93,22 @@ class DiscussionRepository(private val sharedPreferences: SharedPreferences) {
             }
         }
     }
+    suspend fun nextClicked():Either<NextFailure , None> = suspendCoroutine {
+        continuation ->
+        // TODO finish this
+
+        val currentDiscussion = getCurrentDiscussionId()
+        databaseReference.child(DISCUSSION_ROOT).child(currentDiscussion).removeValue().addOnCompleteListener {
+            if(it.isSuccessful){
+                continuation
+            }else{
+
+            }
+        }
+        // delete the current discussion
+        // go to the lobby page
+
+    }
 }
 data class RemoteMessage(val from:String ,val text :String )
 
