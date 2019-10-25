@@ -12,7 +12,7 @@ import timber.log.Timber
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class DiscussionRepository(val sharedPreferences: SharedPreferences) {
+class DiscussionRepository(private val sharedPreferences: SharedPreferences) {
 
 
     private val databaseReference = FirebaseDatabase.getInstance().reference
@@ -65,6 +65,33 @@ class DiscussionRepository(val sharedPreferences: SharedPreferences) {
             }
         }
 
+    }
+
+    suspend fun getLeftSeconds():Either<GetCreatedAtFailure , Long> = suspendCoroutine{
+        val currentDiscussion = getCurrentDiscussionId()
+        databaseReference.child(DISCUSSION_ROOT).child(currentDiscussion).addListenerForSingleValueEvent(object :ValueEventListener{
+            override fun onCancelled(p0: DatabaseError) {
+                Timber.e(p0.details)
+                it.resume(Either.Left(GetCreatedAtFailure))
+            }
+
+            override fun onDataChange(p0: DataSnapshot) {
+                val long = p0.child(CREATED_AT).getValue(Long::class.java)!!
+                val currentSeconde  = System.currentTimeMillis() /1000
+                Timber.e("${currentSeconde-long}")
+                it.resume(Either.Right(if(currentSeconde - long >1800) -1 else currentSeconde - long ))
+            }
+        })
+
+    }
+    fun deleteTime(){
+        val currentDiscussion = getCurrentDiscussionId()
+        databaseReference.child(DISCUSSION_ROOT).child(currentDiscussion).child(CREATED_AT).setValue(0L).addOnCompleteListener {
+            if(!it.isSuccessful){
+                Timber.e(it.exception)
+                Timber.e("Failure")
+            }
+        }
     }
 }
 data class RemoteMessage(val from:String ,val text :String )

@@ -16,7 +16,10 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-data class DiscussionState(val discusion : Async<Discussion> = Uninitialized , val onNewMassageSent : Event<None>?  = null): State
+data class DiscussionState(val discusion : Async<Discussion> = Uninitialized,
+                           val timeFinishedEvent: Event<None>? = null ,
+                           val timeLeft :Event<Long>? = null ,
+                           val onNewMassageSent : Event<None>?  = null): State
 class DiscussionViewModel() :BaseViewModel<DiscussionState>(DiscussionState()){
     private lateinit var repository: DiscussionRepository
     fun initialize(repository: DiscussionRepository){
@@ -29,13 +32,30 @@ class DiscussionViewModel() :BaseViewModel<DiscussionState>(DiscussionState()){
             }, {
                 setDiscussionState(Fail(DiscussionFailure))
             })
-    }
-    fun getMessageDiscussion(){
-
+        getCreatedAt()
     }
     fun setDiscussionState(state:Async<Discussion>){
         setState {
             copy(discusion = state)
+        }
+    }
+    private fun getCreatedAt(){
+        viewModelScope.launch(Dispatchers.Main) {
+            val either  = async(Dispatchers.IO){
+                repository.getLeftSeconds()
+            }.await()
+            either.either({
+                Timber.e("Failure")
+            }, {
+                setState {
+                    if(it<0){
+                        repository.deleteTime()
+                        copy(timeFinishedEvent = Event(None()))
+                    }else{
+                        copy(timeLeft =  Event(it))
+                    }
+                }
+            })
         }
     }
 
@@ -52,6 +72,12 @@ class DiscussionViewModel() :BaseViewModel<DiscussionState>(DiscussionState()){
                 }
             })
 
+        }
+    }
+    fun setTimeFinished(){
+        repository.deleteTime()
+        setState {
+            copy(timeFinishedEvent =  Event(None()))
         }
     }
 

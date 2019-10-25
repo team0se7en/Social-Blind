@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProviders
 import com.team7.socialblind.databinding.ActivityMainBinding
@@ -38,6 +39,20 @@ class MainActivity : AppCompatActivity() {
             it.discusion.handleDiscussion()
             it.onNewMassageSent?.getContentIfNotHandled()?.apply {
                 handleEvent()
+            }
+            it.timeFinishedEvent?.getContentIfNotHandled().apply {
+             Toast.makeText(this@MainActivity ,"the time is finished ", Toast.LENGTH_LONG ).show()
+            }
+            it.timeLeft?.getContentIfNotHandled()?.apply {
+                if(this ==0L){
+                    Timber.e("entered")
+                    binding.timeView.text = "00:00"
+                }else{
+                    binding.timeView.startTimer(this ){
+                        viewModel.setTimeFinished()
+                    }
+                }
+
             }
         }
         binding.sendButton.setOnClickListener {
