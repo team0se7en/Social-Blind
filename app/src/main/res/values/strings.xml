@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Social Blind</string>
+    <string name="uknown_error">Ukncow Error</string>
 </resources>

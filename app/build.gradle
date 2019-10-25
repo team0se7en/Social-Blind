@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 apply plugin: 'kotlin-android'
 
-apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 29
@@ -21,15 +21,72 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    defaultConfig {
+        vectorDrawables.useSupportLibrary = true
+    }
+
+    dataBinding {
+        enabled true
+    }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'androidx.core:core-ktx:1.0.1'
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.2.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    //Dependencies
+    implementation deps.base.domain
+    implementation deps.android.constraint_layout
+    implementation deps.android.activity
+    implementation deps.android.lifecycle_extensions
+    implementation deps.android.ktx_fragment
+    implementation deps.android.fragment
+    implementation deps.android.curved_view
+    implementation deps.android.appcompat
+    implementation deps.android.recyclerview
+    implementation deps.android.design
+    implementation deps.android.picasso
+    implementation deps.android.shimmer
+    implementation deps.android.circle_imageview
+    implementation deps.android.image_copper
+    implementation deps.android.lottie
+    implementation deps.android.indicator
+    implementation deps.android.multidex
+    implementation deps.android.timbre
+    implementation deps.android.expand_layou
+    implementation deps.android.scalLayout
+    implementation deps.android.recycler_tablayout
+    implementation deps.android.spinner
+    implementation deps.android.backdrop
+    implementation deps.android.flex_layout
+    implementation deps.android.expandableToolabr
+    implementation deps.android.loadingBtn
+    implementation deps.android.customeFab
+    implementation deps.android.prefrences
+    implementation deps.android.tooltip
+    implementation deps.android.gesture
+    implementation deps.android.photoView
+    implementation deps.android.labelView
+    implementation deps.android.curve
+
+    implementation deps.epoxy.core
+    implementation deps.epoxy.databinding
+    implementation deps.epoxy.paging
+    kapt deps.epoxy.processor
+
+    implementation deps.firebase.fcm
+
+    implementation deps.kotlin.kotlin_jre
+    implementation deps.kotlin.coroutines_core
+    implementation deps.kotlin.coroutines_android
+
+    implementation deps.rxJava.core
+    implementation deps.rxJava.rxAndroid
+    implementation deps.rxJava.rxKotlin
+    implementation deps.rxJava.reactive_network
+    implementation deps.rxJava.rxpreferences
 }
+apply plugin: 'com.google.gms.google-services'

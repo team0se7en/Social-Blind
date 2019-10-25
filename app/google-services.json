@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "760449034411",
+    "firebase_url": "https://social-blind.firebaseio.com",
+    "project_id": "social-blind",
+    "storage_bucket": "social-blind.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:760449034411:android:d8e38be247b30f7952efee",
+        "android_client_info": {
+          "package_name": "com.team7.socialblind"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "760449034411-k1qi7gvg9iei9btca3lcfbfqieo31agn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.team7.socialblind",
+            "certificate_hash": "10ad5f06619d2bae65a29d6bb2bf9bcd6d042e25"
+          }
+        },
+        {
+          "client_id": "760449034411-l7j0ocnjreikfbfjahlftsdfuc05rpv6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCUZgtm0JXKyaCUvdmXCXAG9u8515H7TdM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "760449034411-l7j0ocnjreikfbfjahlftsdfuc05rpv6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

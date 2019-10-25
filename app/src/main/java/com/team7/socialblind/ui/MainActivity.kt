@@ -1,7 +1,8 @@
-package com.team7.socialblind
+package com.team7.socialblind.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.team7.socialblind.R
 
 class MainActivity : AppCompatActivity() {
 
