@@ -33,6 +33,8 @@ class MainActivity : AppCompatActivity() {
         val repository = DiscussionRepository(getSharedPreferences(SHARED_PREFERENCES_STRING, Context.MODE_PRIVATE))
         binding = DataBindingUtil.setContentView(this , R.layout.activity_main)
         binding.controller = controller
+        binding.toolbar.userName.text = "Anonymous"
+
         viewModel.initialize(repository)
         viewModel.observe(this ){
             it.discusion.handleDiscussion()
@@ -43,14 +45,14 @@ class MainActivity : AppCompatActivity() {
              Toast.makeText(this@MainActivity ,"the time is finished ", Toast.LENGTH_LONG ).show()
             }
             it.timeLeft?.getContentIfNotHandled()?.apply {
-                /*if(this ==0L){
+                if(this ==0L){
                     Timber.e("entered")
-                    binding.toolbar.text = "00:00"
+                    binding.toolbar.timerView.text = "00:00"
                 }else{
-                    binding.timeView.startTimer(this ){
+                    binding.toolbar.timerView.startTimer(this ){
                         viewModel.setTimeFinished()
                     }
-                }*/
+                }
 
             }
         }

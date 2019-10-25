@@ -9,9 +9,9 @@
         <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:cardCornerRadius="24dp"
+                app:cardBackgroundColor="@color/primaryColor"
                 app:cardElevation="4dp"
-                android:background="@color/primaryColor">
+               >
             <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
@@ -24,10 +24,11 @@
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:srcCompat="@drawable/arrow_left"
                         android:layout_height="wrap_content"/>
-                <de.hdodenhof.circleimageview.CircleImageView
+                <ImageView
                         android:layout_width="45dp"
                         android:layout_marginStart="12dp"
                         android:id="@+id/chatter_image"
+                        android:src="@drawable/anounym"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toEndOf="@id/back_button"
@@ -47,10 +48,9 @@
                         android:layout_width="wrap_content"
                         app:layout_constraintStart_toStartOf="@id/user_name"
                         app:layout_constraintTop_toBottomOf="@id/user_name"
-                        tools:text="11:34"
+                        android:text="00:00"
+                        android:id="@+id/timer_view"
                         android:textColor="@color/white"
-                        android:layout_marginStart="8dp"
-
                         android:layout_height="wrap_content"/>
                 <Button
                         android:layout_width="wrap_content"
