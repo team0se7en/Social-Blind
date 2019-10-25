@@ -1,16 +1,16 @@
 package com.team7.socialblind.repo
 
 import android.content.SharedPreferences
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.*
+import com.roacult.kero.team7.jstarter_domain.functional.Either
 import com.team7.socialblind.models.Discussion
 import com.team7.socialblind.models.Message
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
 import timber.log.Timber
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class DiscussionRepository(val sharedPreferences: SharedPreferences) {
 
@@ -20,28 +20,53 @@ class DiscussionRepository(val sharedPreferences: SharedPreferences) {
         val behaviorSubject  = BehaviorSubject.create<Discussion>()
         val currentDiscussion = getCurrentDiscussionId()
         val userId = getUserId()
-        databaseReference.child(DISCUSSION_ROOT).child(currentDiscussion).addValueEventListener(object :ValueEventListener{
+        Timber.e("$currentDiscussion")
+
+        databaseReference.child(DISCUSSION_ROOT).child(currentDiscussion)
+            .addValueEventListener(object :ValueEventListener{
             override fun onCancelled(p0: DatabaseError) {
                 Timber.e(p0.details)
                 behaviorSubject.onError(p0.toException())
             }
 
             override fun onDataChange(p0: DataSnapshot) {
+                val messages = p0.child(MESSAGES)
                 var list= emptyList<Message>()
-                for (message in p0.children){
-                    list += Message(message.key!! ,message.child(MESSAGE_TEXT).getValue(String::class.java)!!
+                for (message in messages.children){
+                    list += Message(message.key!!
+                        ,message.child(MESSAGE_TEXT).getValue(String::class.java)!!
                         , message.child(from).getValue(String::class.java)!! == userId )
                 }
-                behaviorSubject.onNext(Discussion(list , p0.child(REMOTE_CURRENT_SUBJECT).value as String ))
+                behaviorSubject.onNext(Discussion(list.asReversed() , p0.child(REMOTE_CURRENT_SUBJECT).value as String ))
             }
         })
         return behaviorSubject.toFlowable(BackpressureStrategy.DROP).toObservable()
     }
+    suspend fun sendMessage(text:String):Either<SendMessageFailure , None> {
+        val currentDiscussion = getCurrentDiscussionId()
+        val userId = getUserId()
+        return databaseReference.child(DISCUSSION_ROOT).child(currentDiscussion).child(MESSAGES).push().submitMessage(text, userId)
+    }
     private fun getUserId():String{
-        return sharedPreferences.getString(UID ,"")!!
+        return sharedPreferences.getString(UID ,"anonymous_00")!!
     }
     private fun getCurrentDiscussionId():String{
-        return sharedPreferences.getString(CURRENT_DISSC , "")!!
+        return sharedPreferences.getString(CURRENT_DISSC , "0")!!
+
+    }
+    private suspend fun DatabaseReference.submitMessage(text:String , uid:String):Either<SendMessageFailure , None> = suspendCoroutine{
+        continuation ->
+        this.setValue(RemoteMessage(uid , text)).addOnCompleteListener {
+            if(it.isSuccessful){
+                continuation.resume(Either.Right(None()))
+            }else{
+                Timber.e(it.exception)
+                continuation.resume(Either.Left(SendMessageFailure))
+            }
+        }
 
     }
 }
+data class RemoteMessage(val from:String ,val text :String )
+
+class None

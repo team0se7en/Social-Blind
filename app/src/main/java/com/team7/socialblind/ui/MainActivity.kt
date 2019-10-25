@@ -14,6 +14,7 @@ import com.team7.socialblind.repo.DiscussionRepository
 import com.team7.socialblind.repo.SHARED_PREFERENCES_STRING
 import com.team7.socialblind.util.Async
 import com.team7.socialblind.util.Success
+import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
 
@@ -32,11 +33,15 @@ class MainActivity : AppCompatActivity() {
         viewModel.observe(this ){
             it.discusion.handleDiscussion()
         }
+        binding.sendButton.setOnClickListener {
+            viewModel.sendMessage(binding.messageEdittext.text.toString())
+        }
 
     }
     fun Async<Discussion>.handleDiscussion(){
         when(this){
             is Success -> {
+                Timber.e("${invoke()}")
                 controller.setData(invoke())
             }
         }
