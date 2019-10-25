@@ -28,6 +28,8 @@ fun setLayoutmanager(recyclerView: RecyclerView, layoutManager: LayoutManagersTy
         LayoutManagersType.LINEARMANAGER -> {
             val manager = LinearLayoutManager(recyclerView.context)
             manager.orientation = managerDetails
+            manager.reverseLayout = true
+            manager.stackFromEnd = true
             manager
         }
         LayoutManagersType.GRIDMANAGER -> GridLayoutManager(recyclerView.context, managerDetails)

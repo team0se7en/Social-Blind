@@ -78,7 +78,8 @@ dependencies {
     kapt deps.epoxy.processor
 
     implementation deps.firebase.fcm
-
+    implementation 'com.google.firebase:firebase-analytics:17.2.0'
+    implementation 'com.google.firebase:firebase-database-ktx:19.2.0'
     implementation deps.kotlin.kotlin_jre
     implementation deps.kotlin.coroutines_core
     implementation deps.kotlin.coroutines_android
