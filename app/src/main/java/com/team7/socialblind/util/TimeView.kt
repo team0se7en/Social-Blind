@@ -8,6 +8,7 @@ import android.os.SystemClock
 import android.util.AttributeSet
 import android.widget.TextView
 import androidx.annotation.Nullable
+import com.team7.socialblind.R
 
 class TimeView : TextView {
 
@@ -73,7 +74,7 @@ class TimeView : TextView {
      * */
     fun startTimer(time : Long,onFinish : ()->Unit){
         onTimeFinishlistner = onFinish
-        setTextColor(Color.BLACK)
+        setTextColor(resources.getColor(R.color.primaryTextColor))
         timeHandler.removeCallbacks(ticker)
         if(!itsAlredyStart || pauseTime){
             pauseTime = false

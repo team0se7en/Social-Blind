@@ -37,7 +37,20 @@ class DiscussionRepository(private val sharedPreferences: SharedPreferences) {
                         ,message.child(MESSAGE_TEXT).getValue(String::class.java)!!
                         , message.child(from).getValue(String::class.java)!! == userId )
                 }
-                behaviorSubject.onNext(Discussion(list.asReversed() , p0.child(REMOTE_CURRENT_SUBJECT).value as String ))
+
+                val currentSubjectid =  p0.child(REMOTE_CURRENT_SUBJECT).value as String
+                databaseReference.child(subject).child(currentSubjectid).addListenerForSingleValueEvent(object :ValueEventListener{
+
+                    override fun onCancelled(p0: DatabaseError) {
+                        behaviorSubject.onError(p0.toException())
+                    }
+
+                    override fun onDataChange(p0: DataSnapshot) {
+
+                        behaviorSubject.onNext(Discussion(list.asReversed() , p0.value as String))
+                    }
+                })
+
             }
         })
         return behaviorSubject.toFlowable(BackpressureStrategy.DROP).toObservable()
@@ -79,7 +92,7 @@ class DiscussionRepository(private val sharedPreferences: SharedPreferences) {
                 val long = p0.child(CREATED_AT).getValue(Long::class.java)!!
                 val currentSeconde  = System.currentTimeMillis() /1000
                 Timber.e("${currentSeconde-long}")
-                it.resume(Either.Right(if(currentSeconde - long >1800) -1 else currentSeconde - long ))
+                it.resume(Either.Right(if(currentSeconde - long >1800) -1 else 1800 -(currentSeconde - long) ))
             }
         })
 
@@ -107,6 +120,9 @@ class DiscussionRepository(private val sharedPreferences: SharedPreferences) {
         }
         // delete the current discussion
         // go to the lobby page
+
+    }
+    suspend fun changeSubject(): None = suspendCoroutine{
 
     }
 }

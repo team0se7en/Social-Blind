@@ -80,6 +80,9 @@ class DiscussionViewModel() :BaseViewModel<DiscussionState>(DiscussionState()){
             copy(timeFinishedEvent =  Event(None()))
         }
     }
+    fun changeSubject(){
+
+    }
 
 
 

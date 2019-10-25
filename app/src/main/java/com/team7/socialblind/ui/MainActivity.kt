@@ -4,8 +4,10 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProviders
 import com.team7.socialblind.databinding.ActivityMainBinding
@@ -20,9 +22,11 @@ import com.team7.socialblind.util.Success
 import timber.log.Timber
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.team7.socialblind.R
+import com.team7.socialblind.util.Loading
 
-
+const val SUBJECT_STRING = "Her is a subject to talk about it have fun : "
 class MainActivity : AppCompatActivity() {
+    private lateinit var dialog:AlertDialog
 
     private lateinit var binding :ActivityMainBinding
     val viewModel :DiscussionViewModel by lazy {
@@ -35,7 +39,7 @@ class MainActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this , R.layout.activity_main)
         binding.controller = controller
         binding.toolbar.userName.text = "Anonymous"
-
+        dialog = AlertDialog.Builder(this).setView(R.layout.search_match).create()
         viewModel.initialize(repository)
         viewModel.observe(this ){
             it.discusion.handleDiscussion()
@@ -57,12 +61,19 @@ class MainActivity : AppCompatActivity() {
 
             }
         }
+        binding.toolbar.nextButton.setOnClickListener {
+            dialog.show()
+        }
         binding.sendButton.setOnClickListener {
             // implement the on dots pic clicked
         }
+        binding.changeSubject.setOnClickListener {
+            viewModel.changeSubject()
+        }
         binding.messageEdittext.setOnEditorActionListener { textView, i, keyEvent ->
-            if (i == EditorInfo.IME_ACTION_SEND) {
-                viewModel.sendMessage(binding.messageEdittext.text.toString())
+            val text = binding.messageEdittext.text.toString()
+            if (i == EditorInfo.IME_ACTION_SEND && !text.isEmpty()) {
+                viewModel.sendMessage(text)
                 true
             }
              false
@@ -72,9 +83,15 @@ class MainActivity : AppCompatActivity() {
     fun Async<Discussion>.handleDiscussion(){
         when(this){
             is Success -> {
-                Timber.e("${invoke()}")
-                controller.setData(invoke())
+                val disc = invoke()
+                controller.setData(disc)
                 showLastMessage()
+                binding.subject.text = SUBJECT_STRING +disc.currentSubject
+                binding.subjectCard.visibility = View.VISIBLE
+                binding.progress.visibility = View.GONE
+            }
+            is Loading -> {
+                binding.progress.visibility = View.VISIBLE
             }
         }
 
