@@ -5,6 +5,7 @@ import com.google.firebase.database.*
 import com.roacult.kero.team7.jstarter_domain.functional.Either
 import com.team7.socialblind.models.Discussion
 import com.team7.socialblind.models.Message
+import com.team7.socialblind.ui.Info
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
@@ -155,6 +156,36 @@ class DiscussionRepository(private val sharedPreferences: SharedPreferences) {
                 }
             }
     }
+    suspend fun getProfileInfo(isTimeFinished:Boolean ):Either<SendMessageFailure , Info> = suspendCoroutine {
+        continuation ->
+        if(isTimeFinished){
+            sharedPreferences.edit().putBoolean(IS_USER , true)
+            databaseReference.child(USERS).child(sharedPreferences.getString(OTHER_USER_ID, "")!!)
+                .addListenerForSingleValueEvent(object : ValueEventListener{
+                    override fun onCancelled(p0: DatabaseError) {
+                        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                    }
+
+                    override fun onDataChange(p0: DataSnapshot) {
+                        continuation.resume(Either.Right(Info(p0.child("name").value as String , p0.child("imageUrl").value as String )))
+                    }
+                })
+        }else if(sharedPreferences.getBoolean(IS_USER , false)){
+            databaseReference.child(USERS).child(sharedPreferences.getString(OTHER_USER_ID, "")!!)
+                .addListenerForSingleValueEvent(object : ValueEventListener{
+                    override fun onCancelled(p0: DatabaseError) {
+                        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                    }
+
+                    override fun onDataChange(p0: DataSnapshot) {
+                        continuation.resume(Either.Right(Info(p0.child("name").value as String , p0.child("imageUrl").value as String )))
+                    }
+                })
+        }else{
+            continuation.resume(Either.Right(Info("Anonymous", null)))
+        }
+    }
+
 
 
 }

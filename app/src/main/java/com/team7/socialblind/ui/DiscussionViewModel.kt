@@ -15,10 +15,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import timber.log.Timber
-
+data class Info(val name:String , val imageUrl:String? )
 data class DiscussionState(val discusion : Async<Discussion> = Uninitialized,
                            val timeFinishedEvent: Event<None>? = null ,
                            val subjectEvent: Event<String>? = null,
+                           val infoEvent : Event<Info>? = null ,
                            val timeLeft :Event<Long>? = null ,
                            val onNewMassageSent : Event<None>?  = null): State
 class DiscussionViewModel() :BaseViewModel<DiscussionState>(DiscussionState()){
@@ -42,6 +43,14 @@ class DiscussionViewModel() :BaseViewModel<DiscussionState>(DiscussionState()){
             }, {
                 Timber.e(it)
             })
+        val either = viewModelScope.async {  repository.getProfileInfo(false)}
+        viewModelScope.launch {
+            either.await().either({}, {
+                setState {
+                    copy(infoEvent = Event(it))
+                }
+            })
+        }
         getCreatedAt()
     }
     fun setDiscussionState(state:Async<Discussion>){
@@ -91,6 +100,14 @@ class DiscussionViewModel() :BaseViewModel<DiscussionState>(DiscussionState()){
         setState {
             copy(timeFinishedEvent =  Event(None()))
         }
+        val either = viewModelScope.async {  repository.getProfileInfo(true)}
+        viewModelScope.launch {
+            either.await().either({}, {
+                setState {
+                    copy(infoEvent = Event(it))
+                }
+            })
+        }
     }
     fun changeSubject(){
         val either = viewModelScope.async (Dispatchers.IO){
@@ -100,6 +117,8 @@ class DiscussionViewModel() :BaseViewModel<DiscussionState>(DiscussionState()){
             Timber.e(either.await().toString())
         }
     }
+
+
 
 
 

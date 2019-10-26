@@ -21,6 +21,7 @@ import com.team7.socialblind.util.Event
 import com.team7.socialblind.util.Success
 import timber.log.Timber
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.squareup.picasso.Picasso
 import com.team7.socialblind.R
 import com.team7.socialblind.util.Loading
 
@@ -45,6 +46,10 @@ class MainActivity : AppCompatActivity() {
             it.discusion.handleDiscussion()
             it.onNewMassageSent?.getContentIfNotHandled()?.apply {
                 handleEvent()
+            }
+            it.infoEvent?.getContentIfNotHandled()?.apply {
+                binding.toolbar.userName.text = name
+                if(imageUrl !=null) Picasso.get().load(imageUrl).into(binding.toolbar.chatterImage)
             }
             it.timeFinishedEvent?.getContentIfNotHandled().apply {
              Toast.makeText(this@MainActivity ,"the time is finished ", Toast.LENGTH_LONG ).show()
