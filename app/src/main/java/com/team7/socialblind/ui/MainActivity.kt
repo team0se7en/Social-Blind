@@ -25,6 +25,8 @@ import com.squareup.picasso.Picasso
 import com.team7.socialblind.R
 import com.team7.socialblind.util.Loading
 
+
+
 const val SUBJECT_STRING = "Here is a subject to talk about it have fun : "
 class MainActivity : AppCompatActivity() {
     private lateinit var dialog:AlertDialog
@@ -39,7 +41,6 @@ class MainActivity : AppCompatActivity() {
         val repository = DiscussionRepository(getSharedPreferences(SHARED_PREFERENCES_STRING, Context.MODE_PRIVATE))
         binding = DataBindingUtil.setContentView(this , R.layout.activity_main)
         binding.controller = controller
-        binding.toolbar.userName.text = "Anonymous"
         dialog = AlertDialog.Builder(this).setView(R.layout.search_match).create()
         viewModel.initialize(repository)
         viewModel.observe(this ){
@@ -47,12 +48,17 @@ class MainActivity : AppCompatActivity() {
             it.onNewMassageSent?.getContentIfNotHandled()?.apply {
                 handleEvent()
             }
+            it.frieneFound?.getContentIfNotHandled()?.apply {
+                val intent = intent
+                finish()
+                startActivity(intent)
+            }
             it.infoEvent?.getContentIfNotHandled()?.apply {
                 binding.toolbar.userName.text = name
                 if(imageUrl !=null) Picasso.get().load(imageUrl).into(binding.toolbar.chatterImage)
             }
             it.timeFinishedEvent?.getContentIfNotHandled().apply {
-             Toast.makeText(this@MainActivity ,"the time is finished ", Toast.LENGTH_LONG ).show()
+            Timber.e("error")
             }
             it.timeLeft?.getContentIfNotHandled()?.apply {
                 if(this ==0L){
@@ -68,6 +74,7 @@ class MainActivity : AppCompatActivity() {
         }
         binding.toolbar.nextButton.setOnClickListener {
             dialog.show()
+            viewModel.onNextClicked()
         }
         binding.sendButton.setOnClickListener {
             // implement the on dots pic clicked
@@ -99,7 +106,6 @@ class MainActivity : AppCompatActivity() {
                 binding.progress.visibility = View.VISIBLE
             }
         }
-
     }
     fun handleEvent(){
         showLastMessage()

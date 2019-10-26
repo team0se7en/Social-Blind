@@ -20,6 +20,7 @@ data class DiscussionState(val discusion : Async<Discussion> = Uninitialized,
                            val timeFinishedEvent: Event<None>? = null ,
                            val subjectEvent: Event<String>? = null,
                            val infoEvent : Event<Info>? = null ,
+                           val frieneFound:Event<None>? = null,
                            val timeLeft :Event<Long>? = null ,
                            val onNewMassageSent : Event<None>?  = null): State
 class DiscussionViewModel() :BaseViewModel<DiscussionState>(DiscussionState()){
@@ -116,6 +117,17 @@ class DiscussionViewModel() :BaseViewModel<DiscussionState>(DiscussionState()){
         viewModelScope.launch(Dispatchers.Main) {
             Timber.e(either.await().toString())
         }
+    }
+    fun onNextClicked(){
+        repository.onNextClicked().observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+                setState {
+                    copy(frieneFound = Event(None()))
+                }
+            }, {
+                Timber.e(it)
+            })
     }
 
 
