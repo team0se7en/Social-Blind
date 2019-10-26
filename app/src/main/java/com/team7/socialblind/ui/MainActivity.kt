@@ -23,6 +23,7 @@ import timber.log.Timber
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.squareup.picasso.Picasso
 import com.team7.socialblind.R
+import com.team7.socialblind.repo.IS_USER
 import com.team7.socialblind.util.Loading
 
 
@@ -38,7 +39,8 @@ class MainActivity : AppCompatActivity() {
     val controller  = DiscussionController()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val repository = DiscussionRepository(getSharedPreferences(SHARED_PREFERENCES_STRING, Context.MODE_PRIVATE))
+        val sharedPreferences = getSharedPreferences(SHARED_PREFERENCES_STRING, Context.MODE_PRIVATE)
+        val repository = DiscussionRepository(sharedPreferences)
         binding = DataBindingUtil.setContentView(this , R.layout.activity_main)
         binding.controller = controller
         dialog = AlertDialog.Builder(this).setView(R.layout.search_match).create()
@@ -58,7 +60,7 @@ class MainActivity : AppCompatActivity() {
                 if(imageUrl !=null) Picasso.get().load(imageUrl).into(binding.toolbar.chatterImage)
             }
             it.timeFinishedEvent?.getContentIfNotHandled().apply {
-            Timber.e("error")
+                Timber.e("error")
             }
             it.timeLeft?.getContentIfNotHandled()?.apply {
                 if(this ==0L){
@@ -77,7 +79,8 @@ class MainActivity : AppCompatActivity() {
             viewModel.onNextClicked()
         }
         binding.sendButton.setOnClickListener {
-            // implement the on dots pic clicked
+            val text = binding.messageEdittext.text.toString()
+            viewModel.sendMessage(text)
         }
         binding.changeSubject.setOnClickListener {
             viewModel.changeSubject()

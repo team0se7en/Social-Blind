@@ -118,7 +118,7 @@
                 android:layout_width="45dp"
                 android:id="@+id/send_button"
                 android:clickable="true"
-                android:src="@drawable/dots"
+                android:src="@drawable/ic_send_black_24dp"
                 android:layout_height="wrap_content"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>

@@ -122,6 +122,8 @@ class DiscussionRepository(private val sharedPreferences: SharedPreferences) {
             if(!it.isSuccessful){
                 Timber.e(it.exception)
                 Timber.e("Failure")
+            }else{
+                sharedPreferences.edit().putBoolean(IS_USER ,true).commit()
             }
         }
     }
@@ -220,12 +222,14 @@ class DiscussionRepository(private val sharedPreferences: SharedPreferences) {
     }
     suspend fun getProfileInfo(isTimeFinished:Boolean ):Either<SendMessageFailure , Info> = suspendCoroutine {
         continuation ->
+        Timber.e("entered ")
         if(isTimeFinished){
+            Timber.e("enter time is finished")
             sharedPreferences.edit().putBoolean(IS_USER , true)
             databaseReference.child(USERS).child(sharedPreferences.getString(OTHER_USER_ID, "")!!)
                 .addListenerForSingleValueEvent(object : ValueEventListener{
                     override fun onCancelled(p0: DatabaseError) {
-                        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                        Timber.e("Failure time is finished")
                     }
 
                     override fun onDataChange(p0: DataSnapshot) {
@@ -233,10 +237,11 @@ class DiscussionRepository(private val sharedPreferences: SharedPreferences) {
                     }
                 })
         }else if(sharedPreferences.getBoolean(IS_USER , false)){
+            Timber.e("entered is user")
             databaseReference.child(USERS).child(getOtherUserId())
                 .addListenerForSingleValueEvent(object : ValueEventListener{
                     override fun onCancelled(p0: DatabaseError) {
-                        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                        Timber.e("failure ")
                     }
 
                     override fun onDataChange(p0: DataSnapshot) {
@@ -244,11 +249,12 @@ class DiscussionRepository(private val sharedPreferences: SharedPreferences) {
                     }
                 })
         }else{
+            Timber.e("return default ")
             continuation.resume(Either.Right(Info("Anonymous", null)))
         }
     }
     fun getOtherUserId():String{
-        return sharedPreferences.getString(OTHER_USER_ID, "anonyous_01")!!
+        return sharedPreferences.getString(OTHER_USER_ID, "anonymous_01")!!
     }
 
 }
