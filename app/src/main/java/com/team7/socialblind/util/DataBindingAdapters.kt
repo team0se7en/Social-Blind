@@ -16,6 +16,8 @@ import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.material.button.MaterialButton
 import com.squareup.picasso.Picasso
+import com.team7.socialblind.R
+import de.hdodenhof.circleimageview.CircleImageView
 import timber.log.Timber
 
 
@@ -41,6 +43,11 @@ fun setLayoutmanager(recyclerView: RecyclerView, layoutManager: LayoutManagersTy
         }
     }
 
+}
+@BindingAdapter("imageUrl")
+fun setImageUrl(imageView: CircleImageView , imageUrl:String?){
+    if(imageUrl==null) imageView.setImageResource(R.drawable.anounym)
+    else Picasso.get().load(imageUrl).into(imageView)
 }
 
 @BindingAdapter("epoxyController")

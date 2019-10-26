@@ -80,7 +80,9 @@ class MainActivity : AppCompatActivity() {
         }
         binding.sendButton.setOnClickListener {
             val text = binding.messageEdittext.text.toString()
-            viewModel.sendMessage(text)
+            if(!text.isEmpty()){
+                viewModel.sendMessage(text)
+            }
         }
         binding.changeSubject.setOnClickListener {
             viewModel.changeSubject()
