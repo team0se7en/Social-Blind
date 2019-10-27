@@ -80,7 +80,7 @@ class DiscussionRepository(private val sharedPreferences: SharedPreferences) {
         return databaseReference.child(DISCUSSION_ROOT).child(currentDiscussion).child(MESSAGES).push().submitMessage(text, userId)
     }
     private fun getUserId():String{
-        return sharedPreferences.getString(UID ,"anonymous_00")!!
+        return sharedPreferences.getString(UID ,"anonymous_01")!!
     }
     private fun getCurrentDiscussionId():String{
         return sharedPreferences.getString(CURRENT_DISSC , "0")!!
@@ -254,7 +254,7 @@ class DiscussionRepository(private val sharedPreferences: SharedPreferences) {
         }
     }
     fun getOtherUserId():String{
-        return sharedPreferences.getString(OTHER_USER_ID, "anonymous_01")!!
+        return sharedPreferences.getString(OTHER_USER_ID, "anonymous_00")!!
     }
 
 }
